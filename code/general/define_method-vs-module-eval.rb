@@ -1,39 +1,42 @@
 require 'benchmark/ips'
 
-def method_names(number)
-  number.times.map do
-    10.times.inject("") { |e| e << ('a'..'z').to_a.sample}
-  end
+METHODNAMES = 10.times.map do
+  10.times.inject("") { |e| e << ('a'..'z').to_a.sample}
 end
 
-class DefineMethod
-  def self.def_methods(_methods)
-    _methods.each do |method_name|
-      define_method method_name do
-        puts "win"
-      end
+class Class
+  public :define_method
+  public :module_eval
+end
+
+def def_methods(klass, _methods)
+  _methods.each do |method_name|
+    klass.define_method method_name do
+      self
     end
   end
 end
 
-class ModuleEvalWithString
-  def self.def_methods(_methods)
-    _methods.each do |method_name|
-      module_eval %{
+def mod_def_methods(klass, _methods)
+  klass.module_eval(_methods.map do |method_name|
+    %{
         def #{method_name}
-          puts "win"
+          self
         end
-      }
-    end
-  end
+    }
+  end.inject(:concat))
 end
 
 def fast
-  DefineMethod.def_methods(method_names(10))
+  klass = Class.new
+  def_methods(klass, METHODNAMES)
+  METHODNAMES.inject(klass.new, :send)
 end
 
 def slow
-  ModuleEvalWithString.def_methods(method_names(10))
+  klass = Class.new
+  mod_def_methods(klass, METHODNAMES)
+  METHODNAMES.inject(klass.new, :send)
 end
 
 

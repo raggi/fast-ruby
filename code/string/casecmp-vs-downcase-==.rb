@@ -1,13 +1,14 @@
 require 'benchmark/ips'
 
 SLUG = 'ABCD'
+Slug = 'abcd'
 
 def slow
-  SLUG.downcase == 'abcd'
+  SLUG.downcase == Slug
 end
 
 def fast
-  SLUG.casecmp('abcd') == 0
+  SLUG.casecmp(Slug) == 0
 end
 
 Benchmark.ips do |x|

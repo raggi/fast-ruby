@@ -13,8 +13,13 @@ def slow
   (BEGIN_OF_JULY..END_OF_JULY).include? DAY_IN_JULY
 end
 
+def nogarbage
+  DAY_IN_JULY >= BEGIN_OF_JULY && DAY_IN_JULY <= END_OF_JULY
+end
+
 Benchmark.ips do |x|
   x.report("Range#cover?") { fast }
   x.report("Range#include?") { slow }
+  x.report("nogarbage") { nogarbage }
   x.compare!
 end

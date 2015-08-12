@@ -32,6 +32,14 @@ def slow_5
   s.gsub! %r{http://}, ""
 end
 
+# correct because we only want to sub the start.
+# doesn't waste time looking at the rest of the string
+# doesn't allocate until it's time to do so
+# utilizes string COW to reduce allocations.
+def correct_fast
+  return URL.dup if URL[0,7] != 'http://'
+  URL[7,URL.length]
+end
 
 Benchmark.ips do |x|
   x.report("String#['string']=")   { fast   }
@@ -40,5 +48,6 @@ Benchmark.ips do |x|
   x.report("String#[/regexp/]=")   { slow_3 }
   x.report("String#sub!/regexp/")  { slow_4 }
   x.report("String#gsub!/regexp/") { slow_5 }
+  x.report("correct fast") { correct_fast }
   x.compare!
 end

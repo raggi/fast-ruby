@@ -1,11 +1,14 @@
 require 'benchmark/ips'
 
+FOO = "foo".freeze
+BOO = /boo/
+
 def fast
-  "foo".freeze =~ /boo/
+  FOO =~ BOO
 end
 
 def slow
-  "foo".freeze.match(/boo/)
+  FOO.match(BOO)
 end
 
 Benchmark.ips do |x|

@@ -1,6 +1,6 @@
 require 'benchmark/ips'
 
-class User
+class User < Struct.new(:username)
   attr_accessor :first_name
 
   def last_name
@@ -25,8 +25,15 @@ def fast
   user.first_name
 end
 
+def faster
+  user = User.new
+  user.username = 'John'
+  user.username
+end
+
 Benchmark.ips do |x|
   x.report('getter_and_setter') { slow }
   x.report('attr_accessor')     { fast }
+  x.report('struct field')     { faster }
   x.compare!
 end
